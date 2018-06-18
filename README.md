@@ -28,7 +28,7 @@ version tag of your deployment.
 Using last parameter artifacts directory can be configured. By default it creates "records" directory where the app 
 is running from.
 
-This command will create four artifacts per url within you Sitemap and stores them in `<artifact_directory>/<your 
+This command will create four artifacts per url and stores them in `<artifact_directory>/<your 
 website domain>`:
 - Mobile snap shot: `<webpage_path>_mobile.html`
 - Tablet snap shot: `<webpage_path>_tablet.html`
