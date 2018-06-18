@@ -1,0 +1,23 @@
+{
+  "name": "web-time-machine",
+  "author": "Ramin Vakilian <ramin@vakilian.net>",
+  "description": "Creates snapshots of webpages and stores them in git",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/raminv80/webTimeMachine"
+  },
+  "main": "./app.js",
+  "dependencies": {
+    "fs-extra": "^6.0.1",
+    "request": "^2.87.0",
+    "request-promise-native": "^1.0.5",
+    "sanitize-filename": "^1.6.1",
+    "url": "^0.11.0",
+    "webshot": "^0.18.0",
+    "xml2js-es6-promise": "^1.1.1"
+  },
+  "scripts":{
+    "start": "node app.js "
+  }
+}
