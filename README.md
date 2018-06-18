@@ -28,15 +28,15 @@ version tag of your deployment.
 Using last parameter artifacts directory can be configured. By default it creates "records" directory where the app 
 is running from.
 
-This command will create four artifacts per url within you Sitemap and stores them in <artifact_directory>/<your 
-website domain>:
-- Mobile snap shot: <webpage_path>_mobile.html
-- Tablet snap shot: <webpage_path>_tablet.html
-- Desktop snap shot: <webpage_path>_desktop.html
-- Response body: <webpage_path>.html
+This command will create four artifacts per url within you Sitemap and stores them in `<artifact_directory>/<your 
+website domain>`:
+- Mobile snap shot: `<webpage_path>_mobile.html`
+- Tablet snap shot: `<webpage_path>_tablet.html`
+- Desktop snap shot: `<webpage_path>_desktop.html`
+- Response body: `<webpage_path>.html`
   
-Once all artifacts are created they will be committed to a git repository under <artifact_directory>/<your  website 
-domain> with commit message of <verion_tag>.
+Once all artifacts are created they will be committed to a git repository under `<artifact_directory>/<your  website 
+domain>` with commit message of `<verion_tag>`.
 
 ## License
 
