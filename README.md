@@ -1,3 +1,5 @@
+# Web Time Machine
+
 WebTimeMachine creates visual and textual snapshot of web pages by processing site maps and stores them in a git 
 repository.
 
