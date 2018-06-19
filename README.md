@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/raminv80/webTimeMachine.svg?branch=master)](https://travis-ci.org/raminv80/webTimeMachine)
+
 # Web Time Machine
 
 WebTimeMachine creates visual and textual snapshot of web pages by processing site maps and stores them in a git 
