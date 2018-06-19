@@ -31,16 +31,17 @@ class RemoteDiff{
 
   _createRecord(url, data){
     return new Promise((resolve, reject)=>{
-      this._createSnapshots(url)
-        .then(_=>{
-        fs.writeFile(this.record_dir+this._santisizeName(url)+".html", data, err=>{
-          if(err) reject(err); else resolve(true);
-        });
-      }).catch(e=>reject(e));
+      this._createSnapshots(url, data)
+        .then(msg=>{
+          if(this.options.verbose) console.log(msg);
+          fs.writeFile(this.record_dir+this._santisizeName(url)+".html", data, err=>{
+            if(err) reject(err); else resolve(`response captured for ${url}`);
+          });
+        }).catch(e=>reject(e));
     });
   }
 
-  _createSnapshots(url){
+  _createSnapshots(url, content){
     let promises = [];
     let image_path = this.record_dir+this._santisizeName(url);
     let resolutions = {
@@ -63,13 +64,22 @@ class RemoteDiff{
       let resolution = v[0];
       let options = v[1];
       promises.push(new Promise((resolve, reject)=>{
-        webshot(url, `${image_path}_${resolution}.png`, options,function(err) {
-          if(err) reject(err);
-          else {
-            console.log("screen captured for", resolution, url);
-            resolve("screenshots are saved.");
-          }
-        });
+        if(content){
+          options.siteType='html';
+          webshot(content, `${image_path}_${resolution}.png`, options,function(err) {
+            if(err) reject(err);
+            else {
+              resolve(`screen captured for ${url} on ${resolution}`);
+            }
+          });
+        }else{
+          webshot(url, `${image_path}_${resolution}.png`, options,function(err) {
+            if(err) reject(err);
+            else {
+              resolve(`screen captured for ${url} on ${resolution}`);
+            }
+          });
+        }
       }));
     });
 
@@ -84,9 +94,9 @@ class RemoteDiff{
           requestPromise(url)
             .then(body=>{
               if(body){
-                this._createRecord(url, body).then(res=>{
-                  if(res) console.log("Snapshot saved", url);
-                  resolve("Snapshot saved for ", url);
+                this._createRecord(url, body).then(msg=>{
+                  if(this.options.verbose) console.log(msg);
+                  resolve("Webshot saved for ", url);
                 });
               }
             }, e=>{
@@ -128,7 +138,6 @@ class RemoteDiff{
     return new Promise((resolve, reject)=>{
       execProcess.result("cd "+this.record_dir+' && git init . && git add . && git commit -m "'+message+'"', function(err, response){
         if(!err){
-          console.log(response);
           resolve(response);
         }else {
           reject(err);
@@ -137,15 +146,14 @@ class RemoteDiff{
     });
   }
 
-  process(){
+  process(options){
+    let defaults = {
+      verbose : false,
+    };
+    this.options=Object.assign({}, defaults, options);
     if(this.sitemap){
-      console.log('Processing sitemap...');
-      this._processSiteMap(this.sitemap)
-        .then(_this=>this._gitShellCommit(this.version))
-        .catch(e=>{
-          console.log(e);
-          throw e;
-        });
+      return this._processSiteMap(this.sitemap)
+        .then(_this=>this._gitShellCommit(this.version));
     }
   }
 
