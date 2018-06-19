@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="//example.com/main-sitemap.xsl"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <sitemap>
+        <loc>http://example.com/foo.xml</loc>
+        <lastmod>2018-04-26T11:59:04+09:30</lastmod>
+    </sitemap>
+    <sitemap>
+        <loc>http://example.com/bar.xml</loc>
+        <lastmod>2018-04-05T15:46:39+09:30</lastmod>
+    </sitemap>
+</sitemapindex>

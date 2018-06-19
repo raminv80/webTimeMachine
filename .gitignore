@@ -1,3 +1,5 @@
 records/
 !records/.gitkeep
 node_modules
+test/tmp
+!test/tmp/.gitkeep
