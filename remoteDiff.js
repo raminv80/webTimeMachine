@@ -7,6 +7,7 @@ const url = require('url');
 const sanitize = require("sanitize-filename");
 const execProcess = require("./exec_process.js");
 const webshot = require("webshot");
+const batch = require( 'batch-promise' );
 
 class RemoteDiff{
   sanitizeOption(){
@@ -18,7 +19,9 @@ class RemoteDiff{
       version : 'Unnamed version',
       records_dir: __dirname+'/records/',
       remote: false,
-      branch: false
+      branch: false,
+      verbose : false,
+      batch: 3
     };
     this.options=Object.assign({}, defaults, options);
     this.sitemap=sitemap;
@@ -28,6 +31,7 @@ class RemoteDiff{
     this.domain = myUrl.hostname;
     this.branch = options.branch || this.domain;
     this.record_dir = options.records_dir+sanitize(this.domain, this.sanitizeOption)+'/';
+    this.urls = [];
     fs.ensureDirSync(this.record_dir);
   }
 
@@ -96,26 +100,8 @@ class RemoteDiff{
   }
 
   _processUrlSet(urls){
-    return new Promise(resolve=>{
-      let promises = [];
-      urls.forEach(url=>{
-        promises.push(new Promise((resolve, reject)=>{
-          requestPromise(url)
-            .then(body=>{
-              if(body){
-                this._createRecord(url, body).then(msg=>{
-                  if(this.options.verbose) console.log(msg);
-                  resolve("Webshot saved for ", url);
-                });
-              }
-            }, e=>{
-              console.log('Url fetch Error',e.statusCode, url);
-              resolve('Url fetch Error', url);
-            });
-        }));
-      });
-
-      Promise.all(promises).then(_=>resolve(true));
+    urls.forEach(url=>{
+      this.urls.push(url)
     });
   }
 
@@ -128,11 +114,12 @@ class RemoteDiff{
             let promises = [];
             let sitemaps = result.sitemapindex.sitemap.map(data=>data.loc[0]);
             sitemaps.forEach(entry=>promises.push(this._processSiteMap(entry)));
-            Promise.all(promises).then(_=>resolve(true));
+            Promise.all(promises).then(_=>resolve(this.urls));
           }
           if(result.urlset){
             let urls = result.urlset.url.map(entry=>entry.loc[0]);
-            this._processUrlSet(urls).then(_=>resolve(true));
+            this._processUrlSet(urls);
+            resolve(this.urls);
           }
         })
     });
@@ -174,14 +161,32 @@ class RemoteDiff{
     });
   }
 
-  process(options){
-    let defaults = {
-      verbose : false,
-    };
-    this.options=Object.assign({}, defaults, options);
+  processUrls(urls = [], batchSize = 3){
+    return new Promise((batchResolve)=>{
+      let promises = urls.map(url=>(resolve, reject)=>{
+        requestPromise(url)
+          .then(body=>{
+            if(body){
+              this._createRecord(url, body).then(msg=>{
+                if(this.options.verbose) console.log(msg);
+                resolve("Webshot saved for ", url);
+              });
+            }
+          }, e=>{
+            console.log('Url fetch Error',e.statusCode, url);
+            resolve('Url fetch Error', url);
+          });
+      });
+
+      batch(promises, batchSize).then(result=>batchResolve(result))
+    });
+  }
+
+  processSitemap(){
     if(this.sitemap){
       return this._processSiteMap(this.sitemap)
-        .then(_this=>this._gitShellCommit(this.version));
+        .then(urls=>this.processUrls(this.urls, this.options.batch))
+        .then(_this=>this._gitShellCommit(this.options.version));
     }
   }
 

@@ -18,7 +18,7 @@ describe('Creates snapshots', function() {
 
     let sitemap="http://example.com/sitemap_index.xml";
     let remoteDiff = new RemoteDiff(sitemap, {records_dir: __dirname+"/tmp/"});
-    remoteDiff.process().then(_=>done()).catch(e=>console.error(e));
+    remoteDiff.processSitemap().then(_=>done()).catch(e=>console.error(e));
   });
 
   after(function () {

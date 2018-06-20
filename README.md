@@ -22,7 +22,8 @@ This utility is designed for DevOps and is meant to be used as a tool to archive
 
 Once installation is complete run this command to create a snapshot:
 
-    npm start [--version=<verion_tag>] [--records=<artifacts_directory>] [--remote=<remote_git_url>] [--branch=<remote_branch>] <http(s)://url_to_your_website_sitemap.xml>
+    npm start [--version=<verion_tag>] [--records=<artifacts_directory>] [--remote=<remote_git_url>] \ 
+    [--branch=<remote_branch>] [--verbose] [--batch=<batch_size>] <http(s)://url_to_your_website_sitemap.xml>
     
 |Option|Required|description|Default|
 |------|-----------|--------|-------|
@@ -30,6 +31,8 @@ Once installation is complete run this command to create a snapshot:
 |records|no|path to the artifacts directory.|`__dirname/records/`|
 |remote|no|Remote git repository URL|false: by default commits will not be pushed to remote|
 |branch|no|Remote git branch|`<website_domain_name>`|
+|verbose|no|Enables verbose mode|false|
+|batch|no|Urls are processed in concurrently in batch size set by this option|3|
 
 
 This command creates four artifacts per url and stores them in `<records_directory>/<your_website_domain>`:
