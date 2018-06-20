@@ -13,12 +13,21 @@ class RemoteDiff{
     return {replacement: "_"};
   }
 
-  constructor(sitemap, version, RECORDS_DIR){
+  constructor(sitemap, options){
+    let defaults = {
+      version : 'Unnamed version',
+      records_dir: __dirname+'/records/',
+      remote: false,
+      branch: false
+    };
+    this.options=Object.assign({}, defaults, options);
     this.sitemap=sitemap;
-    this.version = version;
+    this.version = options.version;
+    this.remote = options.remote;
     let myUrl = url.parse(sitemap);
     this.domain = myUrl.hostname;
-    this.record_dir = RECORDS_DIR+sanitize(this.domain, this.sanitizeOption)+'/';
+    this.branch = options.branch || this.domain;
+    this.record_dir = options.records_dir+sanitize(this.domain, this.sanitizeOption)+'/';
     fs.ensureDirSync(this.record_dir);
   }
 
@@ -100,13 +109,8 @@ class RemoteDiff{
                 });
               }
             }, e=>{
-              if(e.statusCode===404) {
-                console.log('Url fetch Error',e.statusCode, url);
-                resolve('Url fetch Error', url);
-              }
-              else {
-                reject(e);
-              }
+              console.log('Url fetch Error',e.statusCode, url);
+              resolve('Url fetch Error', url);
             });
         }));
       });
@@ -136,13 +140,37 @@ class RemoteDiff{
 
   _gitShellCommit(message){
     return new Promise((resolve, reject)=>{
-      execProcess.result("cd "+this.record_dir+' && git init . && git add . && git commit -m "'+message+'"', function(err, response){
+      execProcess.result(`
+        cd ${this.record_dir} 
+        git config core.autocrlf false
+        git init .
+        git add . 
+        git commit -m "${message}"`, function (err, response) {
+        if (!err) {
+          if (this.remote) this._gitPushRemote().then(msg => resolve(response + msg));
+          else resolve(response);
+        } else {
+          reject(err);
+        }
+      }.bind(this));
+    });
+  }
+
+  _gitPushRemote(){
+    return new Promise((resolve, reject)=>{
+      execProcess.result(`cd ${this.record_dir};
+        if ! git remote | grep origin > /dev/null; then 
+          git remote add origin ${this.remote};
+        fi;
+        git push origin master:${this.branch};
+        `
+        , function(err, response){
         if(!err){
           resolve(response);
         }else {
-          reject(err);
+          resolve(err);
         }
-      });
+      }.bind(this));
     });
   }
 

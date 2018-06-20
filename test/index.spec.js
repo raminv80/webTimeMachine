@@ -17,9 +17,7 @@ describe('Creates snapshots', function() {
       .get("/bar.html").reply(200, helper.sitemap.bar.html);
 
     let sitemap="http://example.com/sitemap_index.xml";
-    let version='Unnamed version';
-    let records_dir = __dirname+"/tmp/";
-    let remoteDiff = new RemoteDiff(sitemap, version, records_dir);
+    let remoteDiff = new RemoteDiff(sitemap, {records_dir: __dirname+"/tmp/"});
     remoteDiff.process().then(_=>done()).catch(e=>console.error(e));
   });
 
