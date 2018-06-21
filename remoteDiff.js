@@ -8,6 +8,7 @@ const sanitize = require("sanitize-filename");
 const execProcess = require("./exec_process.js");
 const webshot = require("webshot");
 const batch = require( 'batch-promise' );
+const sharp = require( 'sharp');
 
 class RemoteDiff{
   sanitizeOption(){
@@ -77,22 +78,20 @@ class RemoteDiff{
       let resolution = v[0];
       let options = v[1];
       promises.push(new Promise((resolve, reject)=>{
-        if(content){
-          options.siteType='html';
-          webshot(content, `${image_path}_${resolution}.png`, options,function(err) {
-            if(err) reject(err);
-            else {
-              resolve(`screen captured for ${url} on ${resolution}`);
-            }
-          });
-        }else{
-          webshot(url, `${image_path}_${resolution}.png`, options,function(err) {
-            if(err) reject(err);
-            else {
-              resolve(`screen captured for ${url} on ${resolution}`);
-            }
-          });
-        }
+        content = content || url;
+        if(content) options.siteType='html';
+        webshot(content || url, `${image_path}_${resolution}.png`, options,function(err) {
+          if(err) reject(err);
+          else {
+            sharp(`${image_path}_${resolution}.png`)
+              .jpeg()
+              .toFile(`${image_path}_${resolution}.jpeg`)
+              .then(_=>{
+                fs.unlinkSync(`${image_path}_${resolution}.png`);
+                resolve(`screen captured for ${url} on ${resolution}`);
+              });
+          }
+        });
       }));
     });
 
