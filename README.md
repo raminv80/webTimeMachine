@@ -13,8 +13,9 @@ This tool can be used as part of a CI build after deployment hook and it has cap
  commits to a github repository.
 
 ## Installation
-
-    npm install web-time-machine
+    git clone https://github.com/raminv80/webTimeMachine
+    cd webTimeMachine
+    npm install
 
 ## Usage
 
