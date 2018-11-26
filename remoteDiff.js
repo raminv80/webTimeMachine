@@ -89,6 +89,12 @@ class RemoteDiff{
               .then(_=>{
                 fs.unlinkSync(`${image_path}_${resolution}.png`);
                 resolve(`screen captured for ${url} on ${resolution}`);
+              })
+              .catch(e=>{
+                if(e=="Error: Processed image is too large for the JPEG format"){
+                  resolve(`Error: Unable to capture ${url} due to large size!`);  
+                } else
+                resolve(`Error! ${e}`);
               });
           }
         });
